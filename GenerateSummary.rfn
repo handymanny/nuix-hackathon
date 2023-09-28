@@ -1,0 +1,131 @@
+<workflow>
+  <name>GenerateSummary</name>
+  <lastModifiedEpoch>1695922278183</lastModifiedEpoch>
+  <producerName>Rampiva Workflow Designer</producerName>
+  <producerVersion>7.4.6</producerVersion>
+  <prerequisites/>
+  <operations>
+    <useCase>
+      <notes></notes>
+      <disabled>false</disabled>
+      <skippable>false</skippable>
+      <caseLocation>C:\Cases\Case LLM</caseLocation>
+      <timeZoneId>America/New_York</timeZoneId>
+      <method>OPEN_CREATE</method>
+      <caseType>SIMPLE</caseType>
+      <caseBackend>CLASSIC</caseBackend>
+      <elasticProperties>
+        <item-array>
+          <item>cluster.name</item>
+          <item>localhost</item>
+        </item-array>
+        <item-array>
+          <item>nuix.transport.hosts</item>
+          <item>127.0.0.1</item>
+        </item-array>
+        <item-array>
+          <item>index.number_of_shards</item>
+          <item></item>
+        </item-array>
+        <item-array>
+          <item>index.number_of_replicas</item>
+          <item></item>
+        </item-array>
+      </elasticProperties>
+      <migrateCaseIfRequired>false</migrateCaseIfRequired>
+      <attemptReopenIfLocked>false</attemptReopenIfLocked>
+      <attemptTimeout>1</attemptTimeout>
+      <predefined>true</predefined>
+    </useCase>
+    <script>
+      <notes></notes>
+      <disabled>false</disabled>
+      <skippable>false</skippable>
+      <scriptType>PYTHON</scriptType>
+      <useScriptFile>false</useScriptFile>
+      <scriptFileName></scriptFileName>
+      <scriptCode>import HTMLParser
+import os
+
+URI = &apos;https://cover-recreational-licensing-fork.trycloudflare.com/api/v1/chat&apos; 
+CONTEXT = &apos;Can you provide a comprehensive summary of the given text? The summary should cover all the key points and main ideas presented in the original text, while also condensing the information into a concise and easy-to-understand format. Please ensure that the summary includes relevant details and examples that support the main ideas, while avoiding any unnecessary information or repetition. The length of the summary should be no more than 100 words, providing a clear and accurate overview without omitting any important information.&apos;
+parser = HTMLParser.HTMLParser()
+
+
+class LLMClient:
+
+    def __init__(self, url):
+        self.URL = url
+
+    def generate_summary(self, context, user_input):
+        history = {&apos;internal&apos;: [], &apos;visible&apos;: []}
+        request = {
+            &apos;user_input&apos;: context + &quot;\n&quot; + user_input,
+            &apos;max_new_tokens&apos;: 250,
+            &apos;auto_max_new_tokens&apos;: False,
+            &apos;max_tokens_second&apos;: 0,
+            &apos;history&apos;: history,
+            &apos;mode&apos;: &apos;chat-instruct&apos;,  # Valid options: &apos;chat&apos;, &apos;chat-instruct&apos;, &apos;instruct&apos;
+            &apos;character&apos;: &apos;AI&apos;,
+            &apos;instruction_template&apos;: &apos;Llama-v2&apos;,  # Will get autodetected if unset
+            &apos;your_name&apos;: &apos;You&apos;,
+            &apos;regenerate&apos;: False,
+            &apos;_continue&apos;: False,
+            &apos;chat_instruct_command&apos;: &apos;Continue the chat dialogue below. Write a single reply for the character &quot;&lt;|character|&gt;&quot;.\n\n&lt;|prompt|&gt;&apos;,
+
+            # Generation params. If &apos;preset&apos; is set to different than &apos;None&apos;, the values
+            # in presets/preset-name.yaml are used instead of the individual numbers.
+            &apos;preset&apos;: &apos;None&apos;,
+            &apos;do_sample&apos;: True,
+            &apos;temperature&apos;: 0.1,
+            &apos;top_p&apos;: 0.1,
+            &apos;typical_p&apos;: 1,
+            &apos;epsilon_cutoff&apos;: 0,  # In units of 1e-4
+            &apos;eta_cutoff&apos;: 0,  # In units of 1e-4
+            &apos;tfs&apos;: 1,
+            &apos;top_a&apos;: 0,
+            &apos;repetition_penalty&apos;: 1.18,
+            &apos;repetition_penalty_range&apos;: 0,
+            &apos;top_k&apos;: 40,
+            &apos;min_length&apos;: 0,
+            &apos;no_repeat_ngram_size&apos;: 0,
+            &apos;num_beams&apos;: 1,
+            &apos;penalty_alpha&apos;: 0,
+            &apos;length_penalty&apos;: 1,
+            &apos;early_stopping&apos;: False,
+            &apos;mirostat_mode&apos;: 0,
+            &apos;mirostat_tau&apos;: 5,
+            &apos;mirostat_eta&apos;: 0.1,
+            &apos;grammar_string&apos;: &apos;&apos;,
+            &apos;guidance_scale&apos;: 1,
+            &apos;negative_prompt&apos;: &apos;&apos;,
+
+            &apos;seed&apos;: -1,
+            &apos;add_bos_token&apos;: True,
+            &apos;truncation_length&apos;: 2048,
+            &apos;ban_eos_token&apos;: False,
+            &apos;custom_token_bans&apos;: &apos;&apos;,
+            &apos;skip_special_tokens&apos;: True,
+            &apos;stopping_strings&apos;: []
+        }
+
+        response = rest.post(self.URL, request)
+        result = response.json()[&apos;results&apos;][0][&apos;history&apos;]
+        return parser.unescape(result[&apos;visible&apos;][-1][1])
+
+# Initialize client
+client = LLMClient(URI)
+
+# Get small set of items
+items = currentCase.search(&apos;document-id:(DOC-00000460 OR DOC-00000056 OR DOC-00000068 OR DOC-00000326 OR DOC-00000001)&apos;)
+
+# Get extracted text and summarize
+for item in items:
+	extracted_text = item.getTextObject().toString()
+	summary = client.generate_summary(CONTEXT, extracted_text)
+
+	print(&quot;Item: &apos;&quot; + item.getName() + &quot;&apos;\n Summary:\n&quot;+str(summary.split(&quot;\n&quot;)[1]))      </scriptCode>
+    </script>
+  </operations>
+  <explicitExecutionMode>AUTODETECT</explicitExecutionMode>
+</workflow>

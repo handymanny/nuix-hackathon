@@ -1,0 +1,151 @@
+<workflow>
+  <name>QueryDB</name>
+  <lastModifiedEpoch>1695923868601</lastModifiedEpoch>
+  <producerName>Rampiva Workflow Designer</producerName>
+  <producerVersion>7.4.6</producerVersion>
+  <prerequisites/>
+  <operations>
+    <configureParameters>
+      <notes></notes>
+      <disabled>false</disabled>
+      <skippable>false</skippable>
+      <staticParameters/>
+      <userParameters>
+        <parameter>
+          <name>{text_query}</name>
+          <parameterType>TEXT</parameterType>
+          <useLibraryFile>false</useLibraryFile>
+          <friendlyName>Text Query</friendlyName>
+          <description></description>
+          <regex></regex>
+          <displayCondition>
+            <displayable>true</displayable>
+          </displayCondition>
+          <value>Emails where Carol talks about a waiver</value>
+        </parameter>
+        <parameter>
+          <name>{number_of_results}</name>
+          <parameterType>INTEGER</parameterType>
+          <useLibraryFile>false</useLibraryFile>
+          <friendlyName>Number Of Results</friendlyName>
+          <description></description>
+          <regex></regex>
+          <displayCondition>
+            <displayable>true</displayable>
+          </displayCondition>
+          <value>5</value>
+        </parameter>
+        <parameter>
+          <name>{should_contain_text}</name>
+          <parameterType>BOOLEAN</parameterType>
+          <useLibraryFile>false</useLibraryFile>
+          <friendlyName>Should Contain Text</friendlyName>
+          <description></description>
+          <regex></regex>
+          <displayCondition>
+            <displayable>true</displayable>
+          </displayCondition>
+          <value>True</value>
+        </parameter>
+        <parameter>
+          <name>{contains}</name>
+          <parameterType>TEXT</parameterType>
+          <useLibraryFile>false</useLibraryFile>
+          <friendlyName>Contains</friendlyName>
+          <description></description>
+          <regex></regex>
+          <displayCondition>
+            <displayable>true</displayable>
+          </displayCondition>
+          <value>Carol</value>
+        </parameter>
+        <parameter>
+          <name>{should_have_metadata}</name>
+          <parameterType>BOOLEAN</parameterType>
+          <useLibraryFile>false</useLibraryFile>
+          <friendlyName>Should Have Metadata</friendlyName>
+          <description></description>
+          <regex></regex>
+          <displayCondition>
+            <displayable>true</displayable>
+          </displayCondition>
+          <value>True</value>
+        </parameter>
+        <parameter>
+          <name>{metdata_field}</name>
+          <parameterType>TEXT</parameterType>
+          <useLibraryFile>false</useLibraryFile>
+          <friendlyName>Metdata Field</friendlyName>
+          <description></description>
+          <regex></regex>
+          <displayCondition>
+            <displayable>true</displayable>
+          </displayCondition>
+          <value>Kind</value>
+        </parameter>
+        <parameter>
+          <name>{metdata_value}</name>
+          <parameterType>TEXT</parameterType>
+          <useLibraryFile>false</useLibraryFile>
+          <friendlyName>Metdata Value</friendlyName>
+          <description></description>
+          <regex></regex>
+          <displayCondition>
+            <displayable>true</displayable>
+          </displayCondition>
+          <value>Email</value>
+        </parameter>
+      </userParameters>
+    </configureParameters>
+    <script>
+      <notes></notes>
+      <disabled>false</disabled>
+      <skippable>false</skippable>
+      <scriptType>PYTHON</scriptType>
+      <useScriptFile>false</useScriptFile>
+      <scriptFileName></scriptFileName>
+      <scriptCode>import subprocess
+
+# Get parameters
+query = str(parameters.get(&quot;{text_query}&quot;))
+number_of_results = str(parameters.get(&quot;{number_of_results}&quot;))
+
+should_contain_text = parameters.getBoolean(&quot;{should_contain_text}&quot;)
+contains_text = str(parameters.get(&quot;{contains}&quot;))
+
+should_have_metadata = parameters.getBoolean(&quot;{should_have_metadata}&quot;)
+metadata_field = str(parameters.get(&quot;{metdata_field}&quot;))
+metadata_value = str(parameters.get(&quot;{metdata_value}&quot;))
+
+# Generate process
+process_args = []
+
+process_args.append(&quot;C:/Python311/python.exe&quot;)
+process_args.append(&quot;C:/Users/ecunningham01/OneDrive - Nuix.com/Desktop/Chat to Code Base/LLMClient/main/ChromaQueryWithArgs.py&quot;)
+
+process_args.append(&apos;--query&apos;)
+process_args.append(query)
+
+process_args.append(&apos;--results&apos;)
+process_args.append(number_of_results)
+
+if should_contain_text:
+	process_args.append(&apos;--containstext&apos;)
+	process_args.append(contains_text)
+
+if should_have_metadata:
+	process_args.append(&apos;--metadatafield&apos;)
+	process_args.append(metadata_field)
+
+	process_args.append(&apos;--metadatavalue&apos;)
+	process_args.append(metadata_value)
+
+result = subprocess.call(process_args, capture_output=True, text=True)
+
+# Print output
+print(result.stdout)
+</scriptCode>
+    </script>
+  </operations>
+  <explicitExecutionMode>AUTODETECT</explicitExecutionMode>
+</workflow>
