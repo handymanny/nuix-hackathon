@@ -5,7 +5,7 @@ from main.Summarizer import Summarizer
 
 logging.basicConfig(level=logging.INFO, format='%(message)s',)
 
-URI = 'http://8f9842eb84e3e1e537.gradio.live:5000/api/v1/chat'
+URI = ''
 
 # Text directories
 TEXT_DIR = 'C:/Users/ecunningham01/OneDrive - Nuix.com/Desktop/Chat to Code Base/Text/'
